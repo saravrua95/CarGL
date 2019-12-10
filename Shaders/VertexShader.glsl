@@ -10,6 +10,10 @@ uniform int  u_Luz0;                // in: Indica si la luz 0 está encedida
 
 varying vec4 v_Color;		        // out: Color al fragment shader
 
+
+
+
+
 void main()
 {
     vec4 LightPos = u_VMatrix*vec4( -100, 100, 50, 1);		// Posición de la luz [fija]
@@ -21,6 +25,7 @@ void main()
 
 	float ambient = 0.15;                               // (15% de int. ambiente)
 	float diffuse = 0.0;
+
 
 	if (u_Luz0>0) {                                     // Si la luz 0 está encendida se calcula la intesidad difusa de L
         diffuse = max(dot(N, L), 0.0);		            // Cálculo de la int. difusa

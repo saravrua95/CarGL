@@ -72,12 +72,13 @@ TPrimitiva::TPrimitiva(int DL, int t)
             //************************ Cargar modelos 3ds ***********************************
             // formato 8 floats por vértice (x, y, z, A, B, C, u, v)
             modelo0 = Load3DS("../../Modelos/NEWRoad.3ds", &num_vertices0);
+            modelo1 = Load3DS("../../Modelos/Road.3ds", &num_vertices1);
 
             break;
 		}
 		case COCHE_ID: { // Creación del coche
 
-		    tx = -2.0;
+		    tx = -1.0;
 		    ty =  0.0;
 		    tz =  0.0;
 		    rr =  0.0;
@@ -195,7 +196,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
 
                 // Cálculo de la matriz modelo
                 modelMatrix     = glm::mat4(1.0f); // matriz identidad
-                modelMatrix     = glm::translate(modelMatrix,glm::vec3(tx, ty, tz));
+                modelMatrix     = glm::translate(modelMatrix,glm::vec3(tx-2, ty, tz));
 
                 modelViewMatrix = escena.viewMatrix * modelMatrix;
 
@@ -216,12 +217,11 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
                 // RUEDA Delantera Izquierda : Cálculo de la matriz modelo
                 modelMatrix     = glm::mat4(1.0f); // matriz identidad
 
-                modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx+0.95, ty+0.45, tz));
+                modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx-1, ty+0.5, tz+2.4));
                 modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(rr), glm::vec3(1,0,0));      // en radianes
                 modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(180.0), glm::vec3(0,0,1));   // en radianes
 
                 modelViewMatrix = escena.viewMatrix * modelMatrix;
-
                 // Envia nuestra ModelView al Vertex Shader
                 glUniformMatrix4fv(escena.uMVMatrixLocation, 1, GL_FALSE, &modelViewMatrix[0][0]);
 
@@ -229,7 +229,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
 
                 // RUEDA Trasera Derecha : Cálculo de la matriz modelo
                 modelMatrix     = glm::mat4(1.0f); // matriz identidad
-                modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx-0.95, ty+0.45, tz));
+                modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx-2, ty, tz));
                 modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(rr), glm::vec3(1,0,0));
 
                 modelViewMatrix = escena.viewMatrix * modelMatrix;
@@ -242,7 +242,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
                 // RUEDA Delantera Izquierda : Cálculo de la matriz modelo
                 modelMatrix     = glm::mat4(1.0f); // matriz identidad
 
-                modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx+0.95, ty+0.45, tz-4.24));
+                modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx+0.25, ty+0.5, tz));
                 modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(rr), glm::vec3(1,0,0));      // en radianes
                 modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(180.0), glm::vec3(0,0,1));   // en radianes
 
@@ -255,7 +255,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
 
                 // RUEDA Trasera Derecha : Cálculo de la matriz modelo
                 modelMatrix     = glm::mat4(1.0f); // matriz identidad
-                modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx-0.95, ty+0.45, tz-4.24));
+                modelMatrix     = glm::translate(modelMatrix, glm::vec3(tx-0.75, ty, tz+2.4));
                 modelMatrix     = glm::rotate(modelMatrix, (float) glm::radians(rr), glm::vec3(1,0,0));
 
                 modelViewMatrix = escena.viewMatrix * modelMatrix;
@@ -284,16 +284,6 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
                 glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo0+3);
 
                 glDrawArrays(GL_TRIANGLES, 0, num_vertices0);
-
-                // Pintar las líneas
-                glUniform4fv(escena.uColorLocation, 1, colores[1]);
-                //                   Asociamos los vértices y sus normales
-                glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1);
-                glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1+3);
-
-                glDrawArrays(GL_TRIANGLES, 0, num_vertices1);
-
-
             }
             break;
         }
@@ -314,13 +304,6 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
 
                 glDrawArrays(GL_TRIANGLES, 0, num_vertices0);
 
-                // Pintar las líneas
-                glUniform4fv(escena.uColorLocation, 1, colores[1]);
-                //                   Asociamos los vértices y sus normales
-                glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1);
-                glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1+3);
-
-                glDrawArrays(GL_TRIANGLES, 0, num_vertices1);
 
 
             }
@@ -343,13 +326,6 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
 
                 glDrawArrays(GL_TRIANGLES, 0, num_vertices0);
 
-                // Pintar las líneas
-                glUniform4fv(escena.uColorLocation, 1, colores[1]);
-                //                   Asociamos los vértices y sus normales
-                glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1);
-                glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1+3);
-
-                glDrawArrays(GL_TRIANGLES, 0, num_vertices1);
 
 
             }
@@ -372,13 +348,6 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
 
                 glDrawArrays(GL_TRIANGLES, 0, num_vertices0);
 
-                // Pintar las líneas
-                glUniform4fv(escena.uColorLocation, 1, colores[1]);
-                //                   Asociamos los vértices y sus normales
-                glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1);
-                glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1+3);
-
-                glDrawArrays(GL_TRIANGLES, 0, num_vertices1);
 
 
             }
@@ -401,13 +370,7 @@ void __fastcall TPrimitiva::Render(int seleccion, bool reflejo)
 
                 glDrawArrays(GL_TRIANGLES, 0, num_vertices0);
 
-                // Pintar las líneas
-                glUniform4fv(escena.uColorLocation, 1, colores[1]);
-                //                   Asociamos los vértices y sus normales
-                glVertexAttribPointer(escena.aPositionLocation, POSITION_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1);
-                glVertexAttribPointer(escena.aNormalLocation, NORMAL_COMPONENT_COUNT, GL_FLOAT, false, STRIDE, modelo1+3);
 
-                glDrawArrays(GL_TRIANGLES, 0, num_vertices1);
 
 
             }
@@ -525,6 +488,8 @@ void __fastcall TEscena::InitGL()
     xy_aspect = (float)tw / (float)th;
     projectionMatrix = glm::perspective(45.0f, xy_aspect, 0.1f, 1000.0f);
     glUniformMatrix4fv(uProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+
 }
 
 
@@ -601,6 +566,7 @@ void __fastcall TEscena::Render()
     glUniform1i(uLuz0Location, gui.light0_enabled);
     glUniformMatrix4fv(uVMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix)); // Para la luz matrix view pero sin escalado!
 
+
     // Dibujar carretera y objetos
     RenderObjects(seleccion);
 
@@ -613,6 +579,45 @@ void __fastcall TEscena::Render()
 // Selecciona un objeto a través del ratón
 void __fastcall TEscena::Pick3D(int mouse_x, int mouse_y)
 {
+    GLint open[4];
+    unsigned char ans[4];
+
+    glGetIntegerv(GL_VIEWPORT, open);
+    glReadPixels(mouse_x, 0-mouse_y+open[3]+open[1],1,1,GL_RGBA,GL_UNSIGNED_BYTE,&ans);
+    switch(ans[0]){
+        case 0: break;
+        case 10: seleccion=1;break;
+        case 20: seleccion=2;break;
+        default:;
+    }
+
+    glUseProgram(shaderProgram->ReturnProgramID());
+    //glValidateProgram(shaderProgram->ReturnProgramID());
+
+    aPositionLocation=shaderProgram->attrib(A_POSITION);
+    aNormalLocation=shaderProgram->attrib(A_NORMAL);
+
+    uProjectionMatrixLocation=shaderProgram->uniform(U_PROJECTIONMATRIX);
+    uMVMatrixLocation=shaderProgram->uniform(U_MVMATRIX);
+    uVMatrixLocation=shaderProgram->uniform(U_VMATRIX);
+    uColorLocation=shaderProgram->uniform(U_COLOR);
+    uLuz0Location=shaderProgram->uniform(U_LUZ0);
+
+    /*
+    std::cout << "a_Position Location: " << aPositionLocation << std::endl;
+    std::cout << "a_Normal Location: " << aNormalLocation << std::endl;
+
+    std::cout << "u_ProjectionMatrix Location: " << uProjectionMatrixLocation << std::endl;
+    std::cout << "u_MVMatrix Location: " << uMVMatrixLocation << std::endl;
+    std::cout << "u_VMatrix Location: " << uVMatrixLocation << std::endl;
+    std::cout << "u_Color Location: " << uColorLocation << std::endl;
+    std::cout << "u_Luz0 Location: " << uLuz0Location << std::endl;
+    */
+
+    // Habilitamos el paso de attributes
+    glEnableVertexAttribArray(aPositionLocation);
+    glEnableVertexAttribArray(aNormalLocation);
+    glUniformMatrix4fv(uProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 }
 
 //************************************************************** Clase TGui
