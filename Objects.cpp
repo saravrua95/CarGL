@@ -402,10 +402,13 @@ TEscena::TEscena() {
     last_x = 0;
     last_y = 0;
 
+
+	std::cout<<"asodjsaiodoisjdoij";
+
     memcpy(view_position, view_position_c, 3*sizeof(float));
     memcpy(view_rotate, view_rotate_c, 16*sizeof(float));
 
-    memcpy(light0_ambient, light0_ambient_c, 4*sizeof(float));
+    //memcpy(light0_ambient, light0_ambient_c, 4*sizeof(float));
 
     memcpy(light0_ambient, light0_ambient_c, 4*sizeof(float));
     memcpy(light0_diffuse, light0_diffuse_c, 4*sizeof(float));
@@ -416,6 +419,11 @@ TEscena::TEscena() {
     memcpy(light1_diffuse, light1_diffuse_c, 4*sizeof(float));
     memcpy(light1_specular, light1_specular_c, 4*sizeof(float));
     memcpy(light1_position, light1_position_c, 4*sizeof(float));
+
+    memcpy(light2_ambient, light2_ambient_c, 4*sizeof(float));
+    memcpy(light2_diffuse, light2_diffuse_c, 4*sizeof(float));
+    memcpy(light2_specular, light2_specular_c, 4*sizeof(float));
+    memcpy(light2_position, light2_position_c, 4*sizeof(float));
 
     memcpy(mat_ambient, mat_ambient_c, 4*sizeof(float));
     memcpy(mat_diffuse, mat_diffuse_c, 4*sizeof(float));
@@ -466,7 +474,21 @@ void __fastcall TEscena::InitGL()
     uMVMatrixLocation=shaderProgram->uniform(U_MVMATRIX);
     uVMatrixLocation=shaderProgram->uniform(U_VMATRIX);
     uColorLocation=shaderProgram->uniform(U_COLOR);
-    uLuz0Location=shaderProgram->uniform(U_LUZ0);
+
+    //uLuz0Location=shaderProgram->uniform(U_LUZ0);
+
+    uLuz0=shaderProgram->uniform(U_LUZ0);
+    uLuz0Position=shaderProgram->uniform(U_LUZ0_POSITION);
+    uLuz0Intensity=shaderProgram->uniform(U_LUZ0_INTENSITY);
+
+    uLuz1=shaderProgram->uniform(U_LUZ1);
+    uLuz1Position=shaderProgram->uniform(U_LUZ1_POSITION);
+    uLuz1Intensity=shaderProgram->uniform(U_LUZ1_INTENSITY);
+
+    uLuz2=shaderProgram->uniform(U_LUZ2);
+    uLuz2Position=shaderProgram->uniform(U_LUZ2_POSITION);
+    uLuz2Intensity=shaderProgram->uniform(U_LUZ2_INTENSITY);
+
 
     /*
     std::cout << "a_Position Location: " << aPositionLocation << std::endl;
@@ -563,9 +585,19 @@ void __fastcall TEscena::Render()
     viewMatrix      = viewMatrix*rotateMatrix;
     viewMatrix      = glm::scale(viewMatrix,glm::vec3(scale, scale, scale));
 
-    glUniform1i(uLuz0Location, gui.light0_enabled);
-    glUniformMatrix4fv(uVMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix)); // Para la luz matrix view pero sin escalado!
+    glUniform1i(uLuz0, gui.light0_enabled);
+    glUniform4fv(uLuz0Position, 1, (const GLfloat *) escena.light0_position);
+    glUniform1i(uLuz0Intensity, gui.light0_intensity);
 
+    glUniform1i(uLuz1, gui.light1_enabled);
+    glUniform4fv(uLuz1Position, 1, (const GLfloat *) escena.light1_position);
+    glUniform1i(uLuz1Intensity, gui.light1_intensity);
+
+    glUniform1i(uLuz2, gui.light2_enabled);
+    glUniform4fv(uLuz2Position, 1, (const GLfloat *) escena.light2_position);
+    glUniform1i(uLuz2Intensity, gui.light2_intensity);
+
+    glUniformMatrix4fv(uVMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix)); // Para la luz matrix view pero sin escalado!
 
     // Dibujar carretera y objetos
     RenderObjects(seleccion);
@@ -601,7 +633,7 @@ void __fastcall TEscena::Pick3D(int mouse_x, int mouse_y)
     uMVMatrixLocation=shaderProgram->uniform(U_MVMATRIX);
     uVMatrixLocation=shaderProgram->uniform(U_VMATRIX);
     uColorLocation=shaderProgram->uniform(U_COLOR);
-    uLuz0Location=shaderProgram->uniform(U_LUZ0);
+    uLuz0=shaderProgram->uniform(U_LUZ0);
 
     /*
     std::cout << "a_Position Location: " << aPositionLocation << std::endl;
@@ -628,10 +660,13 @@ TGui::TGui()
     enable_panel2 = 1;
     light0_enabled = 1;
     light1_enabled = 1;
+    light2_enabled = 1;
     light0_intensity = 0.8;
     light1_intensity = 0.8;
+    light2_intensity = 0.8;
     memcpy(light0_position, light0_position_c, 4*sizeof(float));
     memcpy(light1_position, light1_position_c, 4*sizeof(float));
+    memcpy(light2_position, light2_position_c, 4*sizeof(float));
 }
 
 void controlCallback(int control)
@@ -685,6 +720,8 @@ void __fastcall TGui::Init(int main_window) {
 
     GLUI_Panel *light0 = new GLUI_Panel( roll_lights, "Luz 1" );
     GLUI_Panel *light1 = new GLUI_Panel( roll_lights, "Luz 2" );
+    GLUI_Panel *light2 = new GLUI_Panel( roll_lights, "Luz 3" );
+
 
     new GLUI_Checkbox( light0, "Encendida", &light0_enabled, LIGHT0_ENABLED_ID, controlCallback );
     light0_spinner = new GLUI_Spinner( light0, "Intensidad:", &light0_intensity,
@@ -715,6 +752,19 @@ void __fastcall TGui::Init(int main_window) {
                             &escena.light1_position[2],LIGHT1_POSITION_ID,controlCallback);
     sb->set_float_limits(-100,100);
 
+    new GLUI_Checkbox( light2, "Encendida", &light2_enabled, LIGHT2_ENABLED_ID, controlCallback );
+    light2_spinner = new GLUI_Spinner( light2, "Intensidad:", &light2_intensity,
+                            LIGHT2_INTENSITY_ID, controlCallback );
+    light2_spinner->set_float_limits( 0.0, 1.0 );
+    sb = new GLUI_Scrollbar( light2, "X",GLUI_SCROLL_HORIZONTAL,
+                            &escena.light2_position[0],LIGHT2_POSITION_ID,controlCallback);
+    sb->set_float_limits(-100,100);
+    sb = new GLUI_Scrollbar( light2, "Y",GLUI_SCROLL_HORIZONTAL,
+                            &escena.light2_position[1],LIGHT2_POSITION_ID,controlCallback);
+    sb->set_float_limits(-100,100);
+    sb = new GLUI_Scrollbar( light2, "Z",GLUI_SCROLL_HORIZONTAL,
+                            &escena.light2_position[2],LIGHT2_POSITION_ID,controlCallback);
+    sb->set_float_limits(-100,100);
 
     // Añade una separación
     new GLUI_StaticText( glui, "" );
@@ -799,6 +849,15 @@ void __fastcall TGui::ControlCallback( int control )
                 light1_spinner->disable();
             break;
         }
+
+        case LIGHT2_ENABLED_ID: {
+            if ( light2_enabled )
+                light2_spinner->enable();
+            else
+                light2_spinner->disable();
+            break;
+        }
+
         case LIGHT0_INTENSITY_ID: {
 
             float v[] = {
@@ -821,6 +880,19 @@ void __fastcall TGui::ControlCallback( int control )
             v[2] *= light1_intensity;
             break;
         }
+
+            case LIGHT2_INTENSITY_ID: {
+
+            float v[] = {
+                escena.light2_diffuse[0],  escena.light2_diffuse[1],
+                escena.light2_diffuse[2],  escena.light2_diffuse[3] };
+
+            v[0] *= light2_intensity;
+            v[1] *= light2_intensity;
+            v[2] *= light2_intensity;
+            break;
+        }
+
         case ENABLE_ID: {
             glui2->enable();
             break;
